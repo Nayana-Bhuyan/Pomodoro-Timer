@@ -33,11 +33,13 @@
         let sessionsRemaining;
         let sessionTime;
         let breakTime;
+        let isSession; // Added variable to track session or break
 
         function startPomodoro() {
             sessionsRemaining = parseInt(document.getElementById('sessions').value, 10);
             sessionTime = parseInt(document.getElementById('sessionTime').value, 10) * 60;
             breakTime = parseInt(document.getElementById('breakTime').value, 10) * 60;
+            isSession = true; // Initialized to true when starting
 
             if (isNaN(sessionsRemaining) || isNaN(sessionTime) || isNaN(breakTime)) {
                 alert("Please enter valid numbers for sessions, session time, and break time.");
@@ -64,13 +66,31 @@
                     clearInterval(timer);
 
                     if (sessionsRemaining > 0) {
-                        timerElement.textContent = "Break!";
-                        document.getElementById('alarm').play(); // Play the alarm sound
-                        setTimeout(function () {
-                            startTimer(breakTime);
-                        }, 1000);
+                        isSession = !isSession; // Toggle between session and break
+                        if (isSession) {
+                            timerElement.textContent = "Session!";
+                            document.getElementById('alarm').play(); // Play the alarm sound
+                            setTimeout(function () {
+                                document.getElementById('alarm').pause(); // Pause the alarm sound after 8 seconds
+                                document.getElementById('alarm').currentTime = 0; // Reset audio to the beginning
+                                startTimer(sessionTime);
+                            }, 8000); // 8 seconds break for the alarm
+                        } else {
+                            timerElement.textContent = "Break!";
+                            document.getElementById('alarm').play(); // Play the alarm sound
+                            setTimeout(function () {
+                                document.getElementById('alarm').pause(); // Pause the alarm sound after 8 seconds
+                                document.getElementById('alarm').currentTime = 0; // Reset audio to the beginning
+                                startTimer(breakTime);
+                            }, 8000); // 8 seconds break for the alarm
+                        }
                     } else {
                         timerElement.textContent = "Session Completed!";
+                        document.getElementById('alarm').play(); // Play the alarm sound
+                        setTimeout(function () {
+                            document.getElementById('alarm').pause(); // Pause the alarm sound after 5 seconds
+                            document.getElementById('alarm').currentTime = 0; // Reset audio to the beginning
+                        }, 5000); // 5 seconds break for the alarm after completing the session
                     }
 
                     sessionsRemaining--;
